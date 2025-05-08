@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -22,12 +23,12 @@ class ProductController extends Controller
         return $this->productService->index($paginate);
     }
 
-    public function show(int|string $id){
+    public function show(string $code){
         
-        return $this->productService->show($id);
+        return $this->productService->show($code);
     }
 
-    public function update(Request $request, $id){
+    public function update(Request $request, $code){
         
         try {
             Validator::make($request->all(), [
@@ -59,15 +60,16 @@ class ProductController extends Controller
         } catch (ValidationException $e) {
 
             return response()->json([
-                'message' => 'Os dados fornecidos são inválidos',
+                'message' => 'The data provided is invalid',
                 'errors' => $e->errors()
             ], 422);
         }
-        return $this->productService->update($id);
+
+        return $this->productService->update($code, $request);
     }
 
-    public function delete(int|string $id){
+    public function delete(string $code){
         
-        return $this->productService->delete($id);
+        return $this->productService->delete($code);
     }
 }
