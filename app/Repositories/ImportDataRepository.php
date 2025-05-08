@@ -12,7 +12,7 @@ class ImportDataRepository
             
             Product::create([
                 "code" => ltrim($product['code'], '"'),
-                "status" => "published",
+                "status" => "draft",
                 "imported_t" => now()->format('Y-m-d H:i:s'),
                 "url" => $product['url'],
                 "creator" => $product['creator'],

@@ -19,11 +19,18 @@ class ImportDataService
         try {
             $lastImport = ImportData::latest()->first();
             
-            if ($lastImport) {
-                $lastFileNumber = $lastImport->last_file_number + 1;
-            } else {
-                $lastFileNumber = 1;
+            if($lastImport){
+                if ($lastImport->status === 'fail') {
+                
+                    $lastFileNumber = $lastImport->last_file_number;
+
+                } else {
+                    $lastFileNumber = $lastImport->last_file_number + 1;
+                }
             }
+            else{
+                $lastFileNumber = 1;
+            }            
 
             $lastFileNumberFormatted = str_pad($lastFileNumber, 2, '0', STR_PAD_LEFT);
 
@@ -57,10 +64,10 @@ class ImportDataService
 
                     $this->importDataRepository->create($produtos);
 
-                    ImportData::create([
-                        'last_file_number' => $lastFileNumberFormatted,
-                        'status' => 'success'
-                    ]);
+                    ImportData::updateOrCreate(
+                        ['last_file_number' => $lastFileNumber],
+                        ['status' => 'success']
+                    );
                 }
             }
 
@@ -74,10 +81,20 @@ class ImportDataService
                 $lastFileNumber = 1;
             }
 
-            ImportData::create([
-                'last_file_number' => $lastFileNumber,
-                'status' => 'fail'
-            ]);
+            ImportData::updateOrCreate(
+                ['last_file_number' => $lastFileNumber],
+                ['status' => 'fail']
+            );
+        }
+    }
+
+    public function checkLastImportDataOpenFoodFacts(){
+
+        $lastImport = ImportData::latest()->first();
+
+        if($lastImport->status === 'fail'){
+            
+            $this->importDataOpenFoodFacts();
         }
     }
 }

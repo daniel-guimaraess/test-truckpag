@@ -22,4 +22,12 @@ Ps: O campo status será bastante útil, pois de 1h em 1h, ele irá checar se a 
 
 Camada de serviço ImportData:
 
-Encontrei alguns problemas ao tentar descompactar o arquivo .gz devido ao tamanho muito grande e o processo ocorrer direto em memória, então resolvi iterar diretamente no .gz (precisei consultar a documentação do PHP) pegando os 100 primeiros, e parando o processo, ao invés de descompacta-lo por completo. Outros problemas foram o tamanho do conteudo que vinha nos campos url, categories e ingredients_text, resolvido alterando na migration para longText, e por fim alguns campos "code" estavam vindo com uma aspas a mais, onde fiz uma validação para limpar essa aspas caso ela venha junto.
+Encontrei alguns problemas ao tentar descompactar o arquivo .gz devido ao tamanho muito grande e o processo ocorrer direto em memória, então resolvi iterar diretamente no .gz (precisei consultar a documentação do PHP) pegando os 100 primeiros, e parando o processo, ao invés de descompacta-lo por completo. Outros problemas foram o tamanho do conteudo que vinha nos campos url, categories e ingredients_text, resolvido alterando na migration para longText, e por fim alguns campos "code" estavam vindo com uma aspas a mais, onde fiz uma validação para limpar essa aspas caso ela venha junto. 
+
+Efetuei a implementação do service e repository do ImportData e também criei os dois comandos (se encontra em routes/console.php na nova versão do laravel) que serão executados via Cron, para validar os dados. Ao receber as informações está sendo armazenado 100 produtos da base de dados, com status inicial draft (rascunho).
+
+Utilizei o comando cron abaixo, para ser executado a cada 30 minutos, assim o schedule run será executado e também os comandos.
+
+*/30 * * * * cd /pasta/para/projeto && php artisan schedule:run >> /dev/null 2>&1
+
+Neste momento irei iniciar o desenvolvimento da API, iniciando pelas rotas, e em seguida o controller para validar os campos da requisição.
