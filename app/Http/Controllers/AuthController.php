@@ -8,6 +8,24 @@ use Illuminate\Http\Request;
 class AuthController extends Controller
 {   
 
+    /**
+     * @OA\Post(
+     *     tags={"authentication"},
+     *     summary="Login with user",
+     *     path="/api/login",
+     *     @OA\RequestBody(
+     *          @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  required={"email", "password"},
+     *                  @OA\Property(property="email", type="string", example="admin@backend.com.br"),
+     *                  @OA\Property(property="password", type="string", format="password")
+     *          )
+     *     ),
+     * ),
+     *     @OA\Response(response="200", description=""),
+     * ),
+     */
     public function login(Request $request)
     {
         $credentials = $request->only(['email', 'password']);
@@ -26,6 +44,16 @@ class AuthController extends Controller
         ]);
     }
 
+
+    /**
+     * @OA\Post(
+     *     tags={"authentication"},
+     *     summary="Logout",
+     *     path="/api/logout",
+     *     security={ {"bearerToken": {}} },
+     *     @OA\Response(response="200", description=""),
+     * ),
+     */
     public function logout()
     {
         auth('api')->logout();

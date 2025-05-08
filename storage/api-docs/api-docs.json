@@ -1,0 +1,372 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Documentation",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "authentication"
+                ],
+                "summary": "Login with user",
+                "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@backend.com.br"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "authentication"
+                ],
+                "summary": "Logout",
+                "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "security": [
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Returns all products",
+                "operationId": "1bfaa78d1c2c3848ab8165c5dadcad3e",
+                "parameters": [
+                    {
+                        "name": "paginate",
+                        "in": "query",
+                        "description": "Choose 1 to paginate and 0 not paginate",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/api/products/{code}": {
+            "get": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Returns specific product by code",
+                "operationId": "d3deebb6679ed9b4ecd1c3af94736c15",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 8457489
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Update a specific product by code",
+                "operationId": "0f1e54a84587dee40efb8d8341a15536",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "Product code",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status",
+                                    "imported_t",
+                                    "url",
+                                    "creator"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "trash",
+                                            "published"
+                                        ],
+                                        "example": "draft"
+                                    },
+                                    "imported_t": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-05-08 10:00:00"
+                                    },
+                                    "url": {
+                                        "type": "string",
+                                        "format": "url",
+                                        "example": "https://example.com"
+                                    },
+                                    "creator": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "created_t": {
+                                        "type": "integer",
+                                        "example": 1623497200,
+                                        "nullable": true
+                                    },
+                                    "last_modified_t": {
+                                        "type": "integer",
+                                        "example": 1623497250,
+                                        "nullable": true
+                                    },
+                                    "product_name": {
+                                        "type": "string",
+                                        "example": "Product A",
+                                        "nullable": true
+                                    },
+                                    "quantity": {
+                                        "type": "string",
+                                        "example": "10",
+                                        "nullable": true
+                                    },
+                                    "brands": {
+                                        "type": "string",
+                                        "example": "Brand X",
+                                        "nullable": true
+                                    },
+                                    "categories": {
+                                        "type": "string",
+                                        "example": "Food",
+                                        "nullable": true
+                                    },
+                                    "labels": {
+                                        "type": "string",
+                                        "example": "Label Y",
+                                        "nullable": true
+                                    },
+                                    "cities": {
+                                        "type": "string",
+                                        "example": "City Z",
+                                        "nullable": true
+                                    },
+                                    "purchase_places": {
+                                        "type": "string",
+                                        "example": "Store X",
+                                        "nullable": true
+                                    },
+                                    "stores": {
+                                        "type": "string",
+                                        "example": "Store Y",
+                                        "nullable": true
+                                    },
+                                    "ingredients_text": {
+                                        "type": "string",
+                                        "example": "Water, Sugar",
+                                        "nullable": true
+                                    },
+                                    "traces": {
+                                        "type": "string",
+                                        "example": "Contains nuts",
+                                        "nullable": true
+                                    },
+                                    "serving_size": {
+                                        "type": "string",
+                                        "example": "100g",
+                                        "nullable": true
+                                    },
+                                    "serving_quantity": {
+                                        "type": "number",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "nutriscore_score": {
+                                        "type": "integer",
+                                        "example": 50,
+                                        "nullable": true
+                                    },
+                                    "nutriscore_grade": {
+                                        "type": "string",
+                                        "example": "B",
+                                        "nullable": true
+                                    },
+                                    "main_category": {
+                                        "type": "string",
+                                        "example": "Beverages",
+                                        "nullable": true
+                                    },
+                                    "image_url": {
+                                        "type": "string",
+                                        "example": "https://example.com/image.jpg",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Delete specific product",
+                "description": "Delete a specific product by code, changing status to 'trash'",
+                "operationId": "19602b0a91bf7634caa977a581c8ffba",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "Product code",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        },
+        "/api/products/{code}/publish": {
+            "post": {
+                "tags": [
+                    "products"
+                ],
+                "summary": "Publish specific product",
+                "description": "Publish a specific product by code, changing status to 'published'",
+                "operationId": "05842acab9f42fad882b534386645f55",
+                "parameters": [
+                    {
+                        "name": "code",
+                        "in": "path",
+                        "description": "Product code",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerToken": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerToken": {
+                "type": "http",
+                "description": "Acess token obtido na autenticação",
+                "name": "Authorization",
+                "in": "header",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "authentication",
+            "description": "authentication"
+        },
+        {
+            "name": "products",
+            "description": "products"
+        }
+    ]
+}
