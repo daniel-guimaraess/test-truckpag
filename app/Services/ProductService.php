@@ -22,7 +22,8 @@ class ProductService
         } catch (\Throwable $th) {
 
             return response()->json([
-                'message' => 'Failed to show products'
+                'message' => 'Failed to show products',
+                'error' => $th->getMessage()
             ], 400);
         }
     }

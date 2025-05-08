@@ -18,8 +18,8 @@ class ProductController extends Controller
 
     public function index(Request $request){
         
-        $paginate = $request->query('paginate') ? $request->query('paginate'): 0;
-
+        $paginate = $request->query('paginate') ? $request->query('paginate') : 0;
+        
         return $this->productService->index($paginate);
     }
 
@@ -29,10 +29,9 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, $code){
-        
+        return $request;
         try {
             Validator::make($request->all(), [
-                'code' => 'required|string',
                 'status' => 'required|string|in:draft,trash,published',
                 'imported_t' => 'required|date_format:Y-m-d H:i:s',
                 'url' => 'required|url',
