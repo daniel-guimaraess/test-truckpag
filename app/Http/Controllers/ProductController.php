@@ -29,7 +29,7 @@ class ProductController extends Controller
     }
 
     public function update(Request $request, $code){
-        return $request;
+
         try {
             Validator::make($request->all(), [
                 'status' => 'required|string|in:draft,trash,published',
@@ -70,5 +70,10 @@ class ProductController extends Controller
     public function delete(string $code){
         
         return $this->productService->delete($code);
+    }
+
+    public function publish(string $code){
+        
+        return $this->productService->publish($code);
     }
 }

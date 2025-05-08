@@ -19,6 +19,7 @@ class ProductRepository
     public function update(Product $product, $request){
 
         $product->update([
+            "status" => $request['status'],
             "url" => $request['url'],
             "creator" => $request['creator'],
             "created_t" => intval($request['created_t']),
@@ -44,6 +45,11 @@ class ProductRepository
 
     public function delete(Product $product) {   
 
-        $product->delete();
+        $product->update(['status' => 'trash']);
+    }
+
+    public function publish(Product $product) {   
+
+        $product->update(['status' => 'published']);
     }
 }

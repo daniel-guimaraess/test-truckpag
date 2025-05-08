@@ -31,3 +31,13 @@ Utilizei o comando cron abaixo, para ser executado a cada 30 minutos, assim o sc
 */30 * * * * cd /pasta/para/projeto && php artisan schedule:run >> /dev/null 2>&1
 
 Neste momento irei iniciar o desenvolvimento da API, iniciando pelas rotas, e em seguida o controller para validar os campos da requisição.
+
+Desenvolvi as camadas, sendo elas o controller, service e repository para os produtos, ja adiconando as validações necessárias para uso da API. Implementei também autenticação com JWT, algo que ja utilizo há bastante tempo com a biblioteca tymon/jwt-auth, com ela desenvolvi um middleware para proteção das rotas, onde será necessário efetuar o login para consumir as API's, por padrão agora as rotas utilizam o prefixo /api, com as rotas novas de login e logout, explicarei o passo a passo no final.
+
+Rotas desenvolvidas
+
+GET - /api/products -> Retorna todos produtos
+GET - /api/products/{code} -> Retorna um produto especifico a partir do code
+POST - /api/products/{code}/publish -> Publica um produto, alterando status para "published"
+PUT - /api/products/{code} -> Atualiza um produto especifico a partir do code
+DELETE - /api/products/{code} -> Remove um produto especifico a partir do code, alterando status para "trash"

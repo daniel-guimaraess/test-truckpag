@@ -98,4 +98,29 @@ class ProductService
             ], 400);
         }
     }
+
+    public function publish(string $code){
+        
+        try {
+            $product = $this->productRepository->show($code);
+
+            if(!$product){
+                return response()->json([
+                    'message' => 'Product not found'
+                ], 404);
+            }
+
+            $this->productRepository->publish($product);
+
+            return response()->json([
+                'message' => 'Product published successfully'
+            ], 200);
+
+        } catch (\Throwable $th) {
+
+            return response()->json([
+                'message' => 'Failed to published product'
+            ], 400);
+        }
+    }
 }
