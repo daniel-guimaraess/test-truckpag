@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('import_data', function (Blueprint $table) {
             $table->id();
-            $table->string('last_file');
+            $table->integer('last_file_number');
             $table->enum('status', ['fail', 'success']);
             $table->timestamps();
         });

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ImportData extends Model
 {
     protected $fillable = [
-        "last_file",
+        "last_file_number",
         "status"
     ];
 }
