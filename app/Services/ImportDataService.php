@@ -84,11 +84,13 @@ class ImportDataService
                     Log::channel('importdata')->info('Enviando alerta ao telegram');
 
                     $this->alertService->sendAlertToTelegram('success');
+                    $this->alertService->sendEmail('success');  
                 }
             }
             else{
                 Log::channel('importdata')->info('Não foram encontrados novos dados para importação');
-                $this->alertService->sendAlertToTelegram('information');                
+                $this->alertService->sendAlertToTelegram('information');
+                $this->alertService->sendEmail('information');              
             }
 
         } catch (\Exception $e) {
@@ -110,6 +112,7 @@ class ImportDataService
 
             Log::channel('importdata')->info('Enviando alerta ao telegram');
             $this->alertService->sendAlertToTelegram('fail');
+            $this->alertService->sendEmail('fail');  
         }
     }
 

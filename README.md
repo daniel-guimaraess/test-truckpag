@@ -11,15 +11,8 @@ Projeto focado em desenvolver uma REST API, com os dados do projeto Open Food Fa
 **Containerização:** Docker<br>
 **Integração de Mensagens:** API do Telegram (Bot) e Open Food Facts
 
-## Instalação e configuração local
-### Instalação tecnologias
-- PHP 8.3 - <a href="https://www.php.net/downloads.php">Link</a>
-- Composer - <a href="https://getcomposer.org/">Link</a>
-- Laravel 12 - <a href="https://laravel.com/docs/12.x/installation">Link</a>
-- MySQL - <a href="https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04">Link</a>
-
-### Variáveis de ambiente (.env):
-Após realizar as instalações das tecnologias acima, e clonar o projeto para a máquina local, é necessário configurar as variáveis de ambiente abaixo:
+## Variáveis de ambiente (.env):
+Após clonar o projeto para a máquina local, é necessário configurar as variáveis de ambiente abaixo:
 
 Renomeie arquivo .env.example para .env 
 
@@ -31,6 +24,12 @@ Renomeie arquivo .env.example para .env
     - Preencha com as informações do seu banco de dados, os campos abaixo:
     - **DB_CONNECTION**, **DB_HOST**, **DB_PORT**, **DB_DATABASE**, **DB_USERNAME**, **DB_PASSWORD**
 
+## Instalação e configuração local
+### Instalação tecnologias
+- PHP 8.3 - <a href="https://www.php.net/downloads.php">Link</a>
+- Composer - <a href="https://getcomposer.org/">Link</a>
+- Laravel 12 - <a href="https://laravel.com/docs/12.x/installation">Link</a>
+- MySQL - <a href="https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-20-04">Link</a>
 
 ### Comandos PHP
 
@@ -132,7 +131,7 @@ Pensando sobre os status dos produtos, e como ao importar estou salvando como ra
 
 Para o endpoint de checar a API, eu criei ele público, sem a necessidade de autenticação, a ideia foi retornar a conexão de leitura e escrita com uma string dizendo se esta ok, após acesso usando o <a href="https://stackoverflow.com/questions/42241934/how-can-i-make-a-database-connection-in-laravel">método DB::connection()->getPdo()</a>, para a informação do último Cron, utilizo a data de criação do último ImportData, pois o Cron foi efetuado naquele momento, para o tempo online, utilizei shell_script para consultar tempo ligado do servidor e para memória utilizo a função nativas do PHP como <a href="https://www.php.net/manual/en/function.memory-get-usage.php">memory_get_usage</a>.
 
-Para monitorar importação dos dados, criei um log personalizado chamado import_data, dentro de storage/logs, onde será detalhado todas as vezes que o Cron for executado, para um sistema de alertas, tive a idéia de utilizar o Telegram para receber as mensagens, ja que o mesmo tem a API gratuita, utilizando um bot, pois recentemente utilizei este método em um projeto pessoal de monitoramento com inteligencia artificial, sendo assim, optei por desenvolver uma camada de serviço para o Telegram, com uma configuração bem simples via API, para alertar tanto sobre uma nova importação, quanto uma possível falha.
+Para monitorar importação dos dados, criei um log personalizado chamado import_data, dentro de storage/logs, onde será detalhado todas as vezes que o Cron for executado, para um sistema de alertas, tive a idéia de utilizar dois métodos de alerta, sendo o tradicional E-mail, e também o Telegram para receber as mensagens, ja que o mesmo tem a API gratuita, utilizando um bot, pois recentemente utilizei este método em um projeto pessoal de monitoramento com inteligencia artificial, sendo assim, optei por desenvolver uma camada de serviço para o Telegram, com uma configuração bem simples via API, para alertar tanto sobre uma nova importação, quanto uma possível falha.
 
 #### Camada serviço de Alerta
 Desenvolvi uma camada de serviço com a função de enviar o alerta para o Telegram, consumindo a API gratuita, podendo ser utilizada em qualquer lugar da aplicação.
@@ -150,7 +149,13 @@ Com essas informações em mãos, é só configurar no arquivo .env as variávei
 CHAT_ID_TELEGRAM
 BOT_TOKEN_TELEGRAM
 
-**PS**: Irei deixar um vídeo de demonstração dos alertas chegando em tempo real no repositório.
+#### E-mail
+No exemplo utilizei o servidor smtp da Google, que libera disparos de e-mails gratuitos, principalmente para testes, é necessário configurar as variavéis para utilização, porém deixarei do disponível os dados do e-mail que criei especialmente para o desafio, no **env.example**, caso tenham interesse em testar, única coisa que precisará ser preenchida é a variavél de ambiente **ALERT_EMAIL**, que é responsável por armazenar o e-mail de destinatário (quem irá receber o alerta).
+
+PS: Fique atento ao SPAM.
+
+#### Vídeos demonstrativos
+Deixarei no repositório na pasta videos, dois vídeos demonstrativos, um dos alertas chegando via Telegram, e outro via E-mail.
 
 #### Rotas desenvolvidas
 

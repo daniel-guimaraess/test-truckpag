@@ -2,12 +2,47 @@
 
 namespace App\Services;
 
+use App\Mail\SendMail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AlertService
 {
+    public function sendEmail($type) {
+        try {
+            if(env('ALERT_EMAIL'))
+            {
+                switch ($type) {
+                    case 'fail':
+                        $emoji = '🚨';
+                        $msg = 'Falha ao importar dados';
+                        break;
+                    case 'success':
+                        $emoji = '✅';
+                        $msg = 'Sucesso ao importar dados';
+                        break;
+                    case 'information':
+                        $emoji = 'ℹ️';
+                        $msg = 'Nenhum dado novo para importação';
+                        break;
+                }                
+
+                $nameAlert = "{$emoji} {$msg}";
+                $now = Carbon::now();
+                $data = $now->format('d/m/Y');
+                $hora = $now->format('H:i:s');
+                
+                Mail::to(env('ALERT_EMAIL'), 'Monitoramento')->send(
+                    new SendMail('Monitoramento', $nameAlert, $data, $hora)
+                );
+            }
+            
+        } catch (\Exception $e) {
+            Log::error("Erro ao enviar o e-mail: " . $e->getMessage());
+        }
+    }
 
     public function sendAlertToTelegram(string $type){
         
