@@ -43,7 +43,7 @@ class ImportDataService
 
             $lastFile = 'products_'.$lastFileNumberFormatted.'.json.gz' ?: 'products_01.json.gz';
 
-            $url = 'https://challenges.coode.sh/food/data/jsona/'.$lastFile;
+            $url = 'https://challenges.coode.sh/food/data/json/'.$lastFile;
             $localPath = storage_path('app/'.$lastFile);
             $fileContent = file_get_contents($url);
             

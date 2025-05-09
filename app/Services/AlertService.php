@@ -2,64 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\Alert;
-use App\Repositories\AlertRepository;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class AlertService
 {
-    protected $alertRepository;
-
-    public function __construct(AlertRepository $alertRepository)
-    {
-        $this->alertRepository = $alertRepository;
-    }
-
-    public function getAlert(){
-
-        try {
-            return $this->alertRepository->getAlert();
-
-        } catch (\Throwable $th) {
-
-            return response()->json([
-                'message' => 'Failed to show alert configuration'
-            ], 400);
-        }
-    }  
-
-    public function update(int|string $id, Request $request){
-        
-        try {           
-            if(!$alert = Alert::find($id)){
-                return response()->json([
-                    'message' => 'Alert not found'
-                ], 404);
-            }
-   
-            $this->alertRepository->update($alert, $request);
-
-            return response()->json([
-                'message' => 'Alert updated successfully'
-            ], 200);
-
-        } catch (\Throwable $th) {
-
-            return response()->json([
-                'message' => 'Failed to update alert',
-                'error' => $th->getMessage()
-            ], 400);
-        }
-    }
 
     public function sendAlertToTelegram(string $type){
+        
+        $chatId = env('CHAT_ID_TELEGRAM');
+        $botToken = env('BOT_TOKEN_TELEGRAM');
 
-        $alert = $this->getAlert();
-
-        if($alert){
+        if($chatId && $botToken){
 
             switch ($type) {
                 case 'fail':
@@ -85,8 +40,8 @@ class AlertService
             $message .= "Data: *{$data}*\n";
             $message .= "Hora: *{$hora}*";
 
-            $response = Http::post("https://api.telegram.org/bot{$alert->bot_token}/sendMessage", [
-                'chat_id' => $alert->chat_id,
+            $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                'chat_id' => $chatId,
                 'text' => $message,
                 'parse_mode' => 'Markdown'
             ]);

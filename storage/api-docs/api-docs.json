@@ -61,6 +61,23 @@
                 ]
             }
         },
+        "/api/checkapi": {
+            "get": {
+                "tags": [
+                    "check api"
+                ],
+                "summary": "Check status api",
+                "operationId": "97e643abcdfa2ba41c865f6f1fae182e",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
         "/api/products": {
             "get": {
                 "tags": [
@@ -363,6 +380,10 @@
         {
             "name": "authentication",
             "description": "authentication"
+        },
+        {
+            "name": "check api",
+            "description": "check api"
         },
         {
             "name": "products",

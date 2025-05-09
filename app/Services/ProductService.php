@@ -49,7 +49,7 @@ class ProductService
         }
     }
 
-    public function update(string $code, Request $request){
+    public function update(string $code, $request){
         
         try {
             $product = $this->productRepository->show($code);
@@ -69,7 +69,8 @@ class ProductService
         } catch (\Throwable $th) {
 
             return response()->json([
-                'message' => 'Failed to update product'
+                'message' => 'Failed to update product',
+                'error' => $th->getMessage()
             ], 400);
         }
     }
