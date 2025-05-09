@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Alert;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -21,11 +20,6 @@ class DatabaseSeeder extends Seeder
             [
             'name' => 'Admin',
             'password' => '#Admin10',
-        ]);
-
-        Alert::firstOrCreate([
-            'chat_id' => null,
-            'bot_token' => null
         ]);
     }
 }
