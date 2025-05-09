@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CheckApiController;
 use App\Http\Controllers\ProductController;
 use App\Http\Middleware\apiProtectedRoute;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login']);
+Route::get('checkapi', [CheckApiController::class, 'checkApi']);
 
 Route::middleware([apiProtectedRoute::class])->group(function () { 
 

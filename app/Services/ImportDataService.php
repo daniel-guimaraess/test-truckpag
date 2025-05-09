@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ImportData;
 use App\Repositories\ImportDataRepository;
+use Illuminate\Support\Facades\Log;
 
 class ImportDataService
 {
@@ -17,11 +18,14 @@ class ImportDataService
     public function importDataOpenFoodFacts(){
         
         try {
+            Log::channel('importdata')->info('------------------------------------------------------');
+            Log::channel('importdata')->info('Inicializando Cron para importar dados');
+
             $lastImport = ImportData::latest()->first();
             
             if($lastImport){
                 if ($lastImport->status === 'fail') {
-                
+                    
                     $lastFileNumber = $lastImport->last_file_number;
 
                 } else {
@@ -29,6 +33,7 @@ class ImportDataService
                 }
             }
             else{
+                Log::channel('importdata')->info('Primeiro import');
                 $lastFileNumber = 1;
             }            
 
@@ -39,10 +44,12 @@ class ImportDataService
             $url = 'https://challenges.coode.sh/food/data/json/'.$lastFile;
             $localPath = storage_path('app/'.$lastFile);
             $fileContent = file_get_contents($url);
-
+            
             if ($fileContent) {
 
                 file_put_contents($localPath, $fileContent);
+
+                Log::channel('importdata')->info('Dados baixado com sucesso');
 
                 if (file_exists($localPath)) {
                     $gz = gzopen($localPath, 'r');
@@ -62,13 +69,20 @@ class ImportDataService
                     gzclose($gz);
                     unlink($localPath);
 
+                    Log::channel('importdata')->info('Registrando dados');
+
                     $this->importDataRepository->create($produtos);
 
                     ImportData::updateOrCreate(
                         ['last_file_number' => $lastFileNumber],
                         ['status' => 'success']
                     );
+
+                    Log::channel('importdata')->info('Dados registrados com sucesso');
                 }
+            }
+            else{
+                Log::channel('importdata')->info('Não foram encontrados novos dados para importação');
             }
 
         } catch (\Exception $e) {
@@ -85,6 +99,8 @@ class ImportDataService
                 ['last_file_number' => $lastFileNumber],
                 ['status' => 'fail']
             );
+
+            Log::channel('importdata')->error('Falha ao importar dados: '.$e);
         }
     }
 
@@ -93,6 +109,8 @@ class ImportDataService
         $lastImport = ImportData::latest()->first();
 
         if($lastImport->status === 'fail'){
+
+            Log::channel('importdata')->info('Inicializando nova tentativa para importar dados na data: '.$lastImport->created_at->format('Y-m-d H:i:s'));
             
             $this->importDataOpenFoodFacts();
         }

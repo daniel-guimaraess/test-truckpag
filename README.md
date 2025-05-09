@@ -36,8 +36,15 @@ Desenvolvi as camadas, sendo elas o controller, service e repository para os pro
 
 Rotas desenvolvidas
 
+GET - /api/checkapi -> Retorna um overview da API
 GET - /api/products -> Retorna todos produtos
 GET - /api/products/{code} -> Retorna um produto especifico a partir do code
 POST - /api/products/{code}/publish -> Publica um produto, alterando status para "published"
 PUT - /api/products/{code} -> Atualiza um produto especifico a partir do code
 DELETE - /api/products/{code} -> Remove um produto especifico a partir do code, alterando status para "trash"
+
+Documentação API Swagger desenvolvida e acessivel via /api/documentation
+
+Para o endpoint de checar a API, eu criei ele público, sem a necessidade de autenticação, a ideia foi retornar a conexão de leitura e escrita com uma string dizendo se esta ok, após acesso usando o método DB::connection()->getPdo(), para o cron, utilizo a data de criação do último import, pois ele foi efetuado naquele momento, para o tempo online, utilizei shell_script para consultar tempo ligado do servidor e para memória utilizo a função nativas do PHP como memory_get_usage.
+
+Para monitorar importação dos dados, criei um log personalizado chamado import_data, onde será detalhado todas as vezes que o Cron for executado, para um sistema de alertas, tive a idéia de utilizar o Telegram para receber as mensagens, ja que o mesmo tem a API gratuita, utilizando um bot, pois recentemente utilizei este método em um projeto pessoal de monitoramento com inteligencia artificial, sendo assim, optei por desenvolver uma camada de serviço para o Telegram, com uma configuração bem simples via API, para alertar tanto sobre uma nova importação, quanto uma possível falha.
