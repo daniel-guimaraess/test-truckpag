@@ -9,7 +9,7 @@ Projeto focado em desenvolver uma REST API, com os dados do projeto Open Food Fa
 **Banco de dados:** MySQL 8.0<br>
 **Documentação:** Swagger Open API 3.0<br>
 **Containerização:** Docker<br>
-**Integração de Mensagens:** API do Telegram (Bot) e Open Food Facts
+**Integração de Mensagens e API's:** API do Telegram (Bot) e Open Food Facts
 
 ## Variáveis de ambiente (.env):
 Após clonar o projeto para a máquina local, é necessário configurar as variáveis de ambiente abaixo:
@@ -23,6 +23,9 @@ Renomeie arquivo .env.example para .env
 - **Banco de dados**
     - Preencha com as informações do seu banco de dados, os campos abaixo:
     - **DB_CONNECTION**, **DB_HOST**, **DB_PORT**, **DB_DATABASE**, **DB_USERNAME**, **DB_PASSWORD**
+
+- **ALERT_EMAIL**
+    - Variável que armazena o e-mail que irá receber o alerta da importação.
 
 ## Instalação e configuração local
 ### Instalação tecnologias
@@ -91,16 +94,30 @@ Acessível no link: http://127.0.0.1:8000/api/documentation
 **E-mail:** admin@backend.com.br<br>
 **Password:** #Admin10
 
+## Instalação e configuração Docker
+Para utilizar o Docker, configure corretamenta as variáveis de ambiente conforme já informado anteriormente, porém haverá uma mudança, a variável **DB_HOST**, é necessário ser alterada para **database**, pois este é o nome do serviço (container) do banco de dados no docker compose, para conexão entre os containers, feito isso acesse a raiz do projeto e apenas execute o comando abaixo:
+
+```bash
+docker compose up
+```
+Feito isso, toda estrutura ja será preparada automaticamente, já subindo uma instância container do backend, banco de dados e nginx (para proxy reverso), ele também iniciará o Cron dentro do container para importação dos dados, assim que o container subir ele executará os comandos, e já deverá emitir um alerta no e-mail e telegram (se ambos configurados corretamente), validando o envio.
+
+Na arquitetura do docker, eu costumo utilizar o script **entrypoint.sh**, pois ele executa diversos comandos ao iniciar o container, assim separo as informações do Dockerfile das dependencias do Laravel (dentro do entrypoint), também utilizo um script muito útil que é o **wait-for-it**, pois as vezes o container do backend inicia antes do banco de dados, e ao rodar as migrations ele falha, então esse script espera o banco estar 100% disponível, para ai sim executar todos comandos do Laravel.
+
+Link para acessar aplicação no browser: http://localhost<br>
+Link para acessar documentação swagger no browser: http://localhost/api/documentation<br>
+Para teste de API (via postman): http://localhost/api
+
 ### Linha de raciocínio no desenvolvimento
 
 #### Configuração ambiente
 Meu primeiro passo foi definir qual banco de dados e optei pelo MySQL, pela minha experência maior diretamente com o framework Laravel. Após definido, realizei a configuração do driver e as informações no arquivo .env para acesso ao banco.
 
 #### Design Pattern
-Para o Design Pattern da aplicação utilizarei três camadas (Three-Tier Architecture), separando em controller, service e repository, deixando a aplicação mais modular e abstraindo a comunicação com o banco de dados das demais lógicas, onde o controller recebe a requisição, realiza as validações dos campos, em seguida é enviado ao service onde serão implementadas validações, funções de comunicação e regras de negócio (se necessário), por fim chegando ao repository para persistência dos dados, usando também injeção de depêndencia, trabalho com essa arquitetura há alguns anos e acho muito eficiente, por isso a minha escolha.
+Para o Design Pattern da aplicação utilizarei Repository Pattern e Service Layer Pattern, separando em controller, service e repository, deixando a aplicação mais modular e abstraindo a comunicação com o banco de dados das demais lógicas, onde o controller recebe a requisição, realiza as validações dos campos, em seguida é enviado ao service onde serão implementadas validações, funções de comunicação e regras de negócio (se necessário), por fim chegando ao repository para persistência dos dados, usando também injeção de depêndencia, trabalho com essa arquitetura há alguns anos e acho muito eficiente, por isso a minha escolha.
 
 #### Produto
-Após analise dos dados (Open Food Facts) irei criar a model do produto, definindo o schema com a migration com base no <a href="https://github.com/daniel-guimaraess/test-truckpag/blob/master/products.json">products.json</a> fornecido, utilizando os campos dele. Uma coisa importante foi enquanto eu analisava, percebi alguns campos faltantes em alguns produtos, que foram determinantes para o uso do nullable no campo específico.
+Após analise dos dados (Open Food Facts) irei criar a model do produto, definindo o schema com a migration com base no <a href="https://github.com/daniel-guimaraess/test-truckpag/blob/master/products.json">products.json</a> fornecido, utilizando os campos dele. Uma coisa importante foi enquanto eu analisava, percebi alguns campos faltantes em alguns produtos, que foram determinantes para o uso do nullable no campo específico dentro da migration.
 
 #### Importação (Cron)
 Seguindo o desafio, agora vou criar uma model chamada ImportData para gerenciar as importações, nela irei armazenar informações relevantes, para facilitar a validação e importação dos dados mais atualizados, como por exemplo salvar qual o último número do arquivo que foi importado, para posteriormente ir direto para o próximo.
@@ -122,35 +139,35 @@ Encontrei alguns problemas ao tentar descompactar o arquivo .gz devido ao tamanh
 
 Efetuei a implementação do service e repository do ImportData e também criei os dois comandos (se encontra em routes/console.php na nova versão do laravel) que serão executados via Cron, para validar os dados. Ao receber as informações está sendo armazenado 100 produtos da base de dados, com status inicial draft (rascunho).
 
-####  Produto API (controller, service e repository)
+####  Produto API (routes, controller, service e repository)
 Neste momento irei iniciar o desenvolvimento das API's, iniciando pelas rotas, e em seguida o controller para validar os campos da requisição.
 
-Desenvolvi as camadas, sendo elas o controller, service e repository para os produtos, ja adiconando as validações necessárias para uso da API. Implementei também autenticação com JWT, algo que ja utilizo há bastante tempo com a biblioteca <a href="https://jwt-auth.readthedocs.io/en/develop/laravel-installation/">tymon/jwt-auth</a>, com ela desenvolvi um middleware para proteção das rotas, onde será necessário efetuar o login para consumir as API's, por padrão agora as rotas utilizam o prefixo /api, incluindo login e logout, explicarei o passo a passo no final.
+Desenvolvi as camadas, sendo elas o controller, service e repository para os produtos, ja adiconando as validações necessárias para uso da API. Implementei também autenticação com JWT (Bearer Token), algo que ja utilizo há bastante tempo com a biblioteca <a href="https://jwt-auth.readthedocs.io/en/develop/laravel-installation/">tymon/jwt-auth</a>, com ela desenvolvi um middleware para proteção das rotas, onde será necessário efetuar o login para consumir as API's, por padrão agora as rotas utilizam o prefixo /api, incluindo login e logout.
 
 Pensando sobre os status dos produtos, e como ao importar estou salvando como rascunho, achei válido desenvolver um endpoint para publicação.
 
 Para o endpoint de checar a API, eu criei ele público, sem a necessidade de autenticação, a ideia foi retornar a conexão de leitura e escrita com uma string dizendo se esta ok, após acesso usando o <a href="https://stackoverflow.com/questions/42241934/how-can-i-make-a-database-connection-in-laravel">método DB::connection()->getPdo()</a>, para a informação do último Cron, utilizo a data de criação do último ImportData, pois o Cron foi efetuado naquele momento, para o tempo online, utilizei shell_script para consultar tempo ligado do servidor e para memória utilizo a função nativas do PHP como <a href="https://www.php.net/manual/en/function.memory-get-usage.php">memory_get_usage</a>.
 
-Para monitorar importação dos dados, criei um log personalizado chamado import_data, dentro de storage/logs, onde será detalhado todas as vezes que o Cron for executado, para um sistema de alertas, tive a idéia de utilizar dois métodos de alerta, sendo o tradicional E-mail, e também o Telegram para receber as mensagens, ja que o mesmo tem a API gratuita, utilizando um bot, pois recentemente utilizei este método em um projeto pessoal de monitoramento com inteligencia artificial, sendo assim, optei por desenvolver uma camada de serviço para o Telegram, com uma configuração bem simples via API, para alertar tanto sobre uma nova importação, quanto uma possível falha.
+Para monitorar importação dos dados, criei um log personalizado chamado import_data, dentro de storage/logs, onde será detalhado todas as vezes que o Cron for executado, para um sistema de alertas, tive a idéia de utilizar dois métodos, sendo o tradicional E-mail, e também o Telegram para receber as mensagens, ja que o mesmo tem a API gratuita, utilizando um bot, pois recentemente utilizei este método em um projeto pessoal de monitoramento com inteligencia artificial, sendo assim, optei por desenvolver uma camada de serviço para o Telegram e E-mail, com uma configuração bem simples diretamento no dotenv, para alertar tanto sobre uma nova importação, quanto uma possível falha.
 
 #### Camada serviço de Alerta
-Desenvolvi uma camada de serviço com a função de enviar o alerta para o Telegram, consumindo a API gratuita, podendo ser utilizada em qualquer lugar da aplicação.
+Desenvolvi uma camada de serviço com a função de enviar o alerta para o Telegram, consumindo a API gratuita, e e-mail utilizando o SMTP do Google, podendo ser utilizada em qualquer lugar da aplicação.
 
 #### Telegram
 Para criar utilizar o Telegram, precisaremos somente de duas informações o chat_id e o bot_token.
 
-**bot_token** é acessivel assim que você cria o bot.<br>
-**chat_id** (do canal ou conversa) é possível acessar após adicionar o bot dentro do canal.
+**chat_id** (do canal ou conversa) é possível acessar após adicionar o bot dentro do canal.<br>
+**bot_token** é acessivel assim que você cria o bot.
 
 Tutorial: https://painel.inouweb.com.br/knowledge-base/article/criar-um-bot-no-telegram-e-obter-seu-chat-id
 
 Com essas informações em mãos, é só configurar no arquivo .env as variáveis:
 
-CHAT_ID_TELEGRAM
+CHAT_ID_TELEGRAM<br>
 BOT_TOKEN_TELEGRAM
 
 #### E-mail
-No exemplo utilizei o servidor smtp da Google, que libera disparos de e-mails gratuitos, principalmente para testes, é necessário configurar as variavéis para utilização, porém deixarei do disponível os dados do e-mail que criei especialmente para o desafio, no **env.example**, caso tenham interesse em testar, única coisa que precisará ser preenchida é a variavél de ambiente **ALERT_EMAIL**, que é responsável por armazenar o e-mail de destinatário (quem irá receber o alerta).
+No exemplo utilizei o servidor smtp da Google, que libera disparos de e-mails gratuitos, principalmente para testes, é necessário configurar as variavéis para utilização, porém deixarei do disponível os dados do e-mail que criei especialmente para o desafio, no **env.example** (isso não é recomendado, mas deixei para que possam testar com facilidade sem a necessidade de criar uma conta nova), caso tenham interesse em testar, única coisa que precisará ser preenchida é a variavél de ambiente **ALERT_EMAIL**, que é responsável por armazenar o e-mail de destinatário (quem irá receber o alerta).
 
 PS: Fique atento ao SPAM.
 
@@ -176,3 +193,9 @@ Implementação de testes com PHPUnit, para os endpoints:
 **GET** - /api/products<br>
 **GET** - /api/products/{code}<br>
 **PUT** - /api/products/{code}
+
+Para testar, execute o comando abaixo:
+
+```bash
+./vendor/bin/phpunit tests/Unit/ProductTest.php
+```

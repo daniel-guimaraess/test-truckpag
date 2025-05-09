@@ -1,0 +1,1 @@
+*/30 * * * * /usr/local/bin/php /var/www/html/artisan schedule:run >> /var/www/html/cron_output.log 2>&1
