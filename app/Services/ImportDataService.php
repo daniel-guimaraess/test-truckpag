@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Log;
 class ImportDataService
 {
     protected $importDataRepository;
+    protected $alertService;
 
-    public function __construct(ImportDataRepository $importDataRepository)
-    {
+    public function __construct(ImportDataRepository $importDataRepository, AlertService $alertService)
+    {   
         $this->importDataRepository = $importDataRepository;
+        $this->alertService = $alertService;
     }
 
     public function importDataOpenFoodFacts(){
@@ -41,7 +43,7 @@ class ImportDataService
 
             $lastFile = 'products_'.$lastFileNumberFormatted.'.json.gz' ?: 'products_01.json.gz';
 
-            $url = 'https://challenges.coode.sh/food/data/json/'.$lastFile;
+            $url = 'https://challenges.coode.sh/food/data/jsona/'.$lastFile;
             $localPath = storage_path('app/'.$lastFile);
             $fileContent = file_get_contents($url);
             
@@ -77,12 +79,16 @@ class ImportDataService
                         ['last_file_number' => $lastFileNumber],
                         ['status' => 'success']
                     );
-
+                    
                     Log::channel('importdata')->info('Dados registrados com sucesso');
+                    Log::channel('importdata')->info('Enviando alerta ao telegram');
+
+                    $this->alertService->sendAlertToTelegram('success');
                 }
             }
             else{
                 Log::channel('importdata')->info('Não foram encontrados novos dados para importação');
+                $this->alertService->sendAlertToTelegram('information');                
             }
 
         } catch (\Exception $e) {
@@ -101,6 +107,9 @@ class ImportDataService
             );
 
             Log::channel('importdata')->error('Falha ao importar dados: '.$e);
+
+            Log::channel('importdata')->info('Enviando alerta ao telegram');
+            $this->alertService->sendAlertToTelegram('fail');
         }
     }
 

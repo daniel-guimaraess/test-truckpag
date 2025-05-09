@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('alerts', function (Blueprint $table) {
             $table->id();
+            $table->string('chat_id')->nullable();
+            $table->string('bot_token')->nullable();
             $table->timestamps();
         });
     }

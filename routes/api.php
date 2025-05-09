@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CheckApiController;
 use App\Http\Controllers\ProductController;
@@ -18,6 +19,11 @@ Route::middleware([apiProtectedRoute::class])->group(function () {
     Route::delete('products/{code}', [ProductController::class, 'delete']);
     Route::post('products/{code}/publish', [ProductController::class, 'publish']);
 
+    #Routes for alerts
+    Route::get('alerts', [AlertController::class, 'getAlert']);
+    Route::put('alerts/{id}', [AlertController::class, 'update']);
+
+    #Routes for auth
     Route::post('logout', [AuthController::class, 'logout']);
 
 });
